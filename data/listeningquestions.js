@@ -250,9 +250,9 @@ const listeningQuestions = [
         { id: 1, text: '① 쓰레기를 모아서 버려야 합니다.' },
         { id: 2, text: '② 물건을 많이 살 필요가 없습니다.' },
         { id: 3, text: '③ 쓰레기를 버리는 곳이 많이 필요합니다.' },
-        { id: 4, text: '④ 영어 수업이 많이 도움이 됩니다.' },
+        { id: 4, text: '④ 환경 보호에 관심을 가져야 합니다.' }
       ],
-      correctAnswer: 4,
+      correctAnswer: 2,
     },
     {
       question: '여자가 왜 이 이야기를 하고 있는지 고르십시오.',
@@ -272,7 +272,7 @@ const listeningQuestions = [
         { id: 1, text: '① 이 대회는 이번 달에 합니다.' },
         { id: 2, text: '② 홈페이지에 대회 내용이 없습니다.' },
         { id: 3, text: '③ 금요일까지 참가 신청을 할 수 있습니다.' },
-        { id: 4, text: '④ 이 대회에 참가 신청을 한 사람이 많습니다.' },
+        { id: 4, text: '④ 이 대회에 참가 신청을 한 사람이 많습니다.' }
       ],
       correctAnswer: 3,
     },
@@ -283,7 +283,7 @@ const listeningQuestions = [
         { id: 1, text: '① 인기 있는 드라마' },
         { id: 2, text: '② 기억에 남는 여행' },
         { id: 3, text: '③ 원하는 휴가 기간' },
-        { id: 4, text: '④ 드라마에 나온 장소' },
+        { id: 4, text: '④ 드라마에 나온 장소' }
       ],
       correctAnswer: 4,
     },

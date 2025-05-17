@@ -8,16 +8,14 @@ import {
   useColorScheme,
   Platform,
   Modal,
-  Pressable,
-  ScrollView,
+  FlatList,
   SafeAreaView,
 } from "react-native";
 import vocabulary from '../data/vocabulary';
 import Tts from 'react-native-tts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const { width, height } = Dimensions.get('window');
-const isIPad = Platform.OS === 'ios' && Platform.isPad;
+const { width } = Dimensions.get('window');
 
 const languages = [
   { code: 'korean', name: '한국어', icon: '🇰🇷' },
@@ -29,9 +27,8 @@ const languages = [
 
 const VocaSection = ({ navigation }) => {
   const [showVoca, setShowVoca] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState('korean');
-  const [showTranslation, setShowTranslation] = useState(false);
+  const [expandedItems, setExpandedItems] = useState({});
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
@@ -123,28 +120,20 @@ const VocaSection = ({ navigation }) => {
 
   const resetVocaState = () => {
     setShowVoca(false);
-    setCurrentIndex(0);
-    setShowTranslation(false);
+    setExpandedItems({});
   };
 
-  const handleNext = () => {
-    if (currentIndex < vocabulary.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setShowTranslation(false);
-    }
+  const toggleTranslation = (index) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
   };
 
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setShowTranslation(false);
-    }
-  };
-
-  const handleCardPress = () => {
-    speakText(vocabulary[currentIndex].korean);
+  const handleCardPress = (item, index) => {
+    speakText(item.korean);
     if (selectedLanguage !== 'korean') {
-      setShowTranslation(!showTranslation);
+      toggleTranslation(index);
     }
   };
 
@@ -159,19 +148,12 @@ const VocaSection = ({ navigation }) => {
     return languageNames[lang] || lang;
   };
 
-  const getTranslationText = (lang) => {
-    if (lang === 'korean') {
-      return '뜻';
-    }
-    return vocabulary[currentIndex].translations[lang];
-  };
-
   useLayoutEffect(() => {
     if (showVoca) {
       navigation.setOptions({
         headerShown: true,
         tabBarStyle: { display: 'none' },
-        headerTitle: '',
+        headerTitle: '단어 학습',
         headerStyle: {
           backgroundColor: theme.backgroundColor,
         },
@@ -207,8 +189,33 @@ const VocaSection = ({ navigation }) => {
     setSelectedLanguage(lang);
     setShowLanguageModal(false);
     setShowVoca(true);
-    setShowTranslation(false);
+    setExpandedItems({});
   };
+
+  // 아이템 렌더링 함수
+  const renderVocabularyItem = ({ item, index }) => (
+    <TouchableOpacity
+      style={[styles.card, { backgroundColor: theme.cardBackground }]}
+      onPress={() => handleCardPress(item, index)}
+      activeOpacity={0.7}
+    >
+      <Text style={[styles.cardText, { color: theme.textColor }]}>
+        {item.korean}
+      </Text>
+      {expandedItems[index] && selectedLanguage !== 'korean' && (
+        <Text style={[styles.translationText, { color: theme.textColor }]}>
+          {item.translations[selectedLanguage]}
+        </Text>
+      )}
+      <View style={styles.speakIconContainer}>
+        <Ionicons 
+          name="volume-high-outline" 
+          size={22} 
+          color={theme.textColor} 
+        />
+      </View>
+    </TouchableOpacity>
+  );
 
   if (!showVoca) {
     return (
@@ -270,37 +277,13 @@ const VocaSection = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-      <View style={styles.cardContainer}>
-        <TouchableOpacity
-          style={[styles.card, { backgroundColor: theme.cardBackground }]}
-          onPress={handleCardPress}
-        >
-          <Text style={[styles.cardText, { color: theme.textColor }]}>
-            {vocabulary[currentIndex].korean}
-          </Text>
-          {showTranslation && selectedLanguage !== 'korean' && (
-            <Text style={[styles.translationText, { color: theme.textColor }]}>
-              {vocabulary[currentIndex].translations[selectedLanguage]}
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
-      <View style={styles.navigationContainer}>
-        <TouchableOpacity
-          onPress={handlePrev}
-          style={[styles.button, currentIndex === 0 && styles.disabledButton]}
-          disabled={currentIndex === 0}
-        >
-          <Text style={styles.buttonText}>이전</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleNext}
-          style={[styles.button, currentIndex === vocabulary.length - 1 && styles.disabledButton]}
-          disabled={currentIndex === vocabulary.length - 1}
-        >
-          <Text style={styles.buttonText}>다음</Text>
-        </TouchableOpacity>
-      </View>
+      <FlatList
+        data={vocabulary}
+        renderItem={renderVocabularyItem}
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 };
@@ -308,9 +291,6 @@ const VocaSection = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
   },
   text: {
     fontSize: 18,
@@ -327,14 +307,12 @@ const styles = StyleSheet.create({
   languageButtonText: {
     fontSize: 16,
   },
-  cardContainer: {
-    width: '90%',
-    height: 250,
-    marginBottom: 30,
+  listContainer: {
+    padding: 16,
+    paddingBottom: 30,
   },
   card: {
     width: '100%',
-    height: '100%',
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
@@ -349,38 +327,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     padding: 20,
+    marginBottom: 16,
+    minHeight: 150,
+    position: 'relative',
   },
   cardText: {
-    fontSize: 40,
+    fontSize: 34,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   translationText: {
-    fontSize: 30,
+    fontSize: 24,
     textAlign: 'center',
     marginTop: 10,
   },
-  navigationContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginHorizontal: 10,
-  },
-  disabledButton: {
-    backgroundColor: "#a0a0a0",
-    opacity: 0.5,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
+  speakIconContainer: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
   },
   fullScreenModal: {
     flex: 1,

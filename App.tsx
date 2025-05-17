@@ -129,7 +129,7 @@ export default function App() {
                 tabBarLabel: "Listening",
               }}
             />
-            <Tab.Screen
+             <Tab.Screen
               name="Voca"
               component={TopikVocaSection}
               options={{

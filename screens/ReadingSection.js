@@ -54,8 +54,8 @@ export default function ReadingSection({ navigation }) {
     optionBorderColor: isDarkMode ? '#666' : '#aaa',
   };
 
-  // 광고 이벤트 설정
-  useEffect(() => {
+   // 광고 이벤트 설정
+   useEffect(() => {
     const onAdLoaded = () => setAdLoaded(true);
     const onAdClosed = () => {
       setAdLoaded(false);
@@ -338,20 +338,20 @@ const handleNextPress = () => {
                 minHeight: currentQuestion.image ? 'auto' : 200
               }
             ]}>
-              <UnderlinedQuestion 
-                question={currentQuestion.question} 
-                underlineWords={currentQuestion.underlineWords}
+            <UnderlinedQuestion 
+              question={currentQuestion.question} 
+              underlineWords={currentQuestion.underlineWords}
                 textColor={theme.textColor}
-              />
-              
-              {currentQuestion.image && (
+            />
+            
+            {currentQuestion.image && (
                 <TouchableOpacity 
                   onPress={() => setShowImageModal(true)}
                   style={styles.imageContainer}
                 >
-                  <Image source={currentQuestion.image} style={styles.questionImage} />
-                </TouchableOpacity>
-              )}
+                <Image source={currentQuestion.image} style={styles.questionImage} />
+              </TouchableOpacity>
+            )}
             </View>
           </View>
         </View>
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
       width: '100%',
     } : {
       flex: 1,
-      marginBottom: 40,
+    marginBottom: 40,
     }),
   },
   questionScroll: {

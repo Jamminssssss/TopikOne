@@ -1,6 +1,6 @@
 export const grammarExamples = [
   {
-    grammar: "이/가",
+    grammar: "이",
     example: "이름이 뭐예요?",
     meanings: {
       en: "subject particle",
@@ -18,7 +18,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "이/가",
+    grammar: "가",
     example: "날씨가 좋아요.",
     meanings: {
       en: "subject particle",
@@ -36,7 +36,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "은/는",
+    grammar: "은",
     example: "선생님은 지금 안 계세요.",
     meanings: {
       en: "topic particle",
@@ -54,7 +54,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "은/는",
+    grammar: "는",
     example: "저는 미국사람이에요.",
     meanings: {
       en: "topic particle",
@@ -72,7 +72,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "을/를",
+    grammar: "을",
     example: "책을 읽어요.",
     meanings: {
       en: "object particle",
@@ -90,7 +90,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "을/를",
+    grammar: "를",
     example: "택시를 불러 주세요.",
     meanings: {
       en: "object particle",
@@ -108,7 +108,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "와/과",
+    grammar: "와",
     example: "토미 씨와 친구예요.",
     meanings: {
       en: "and, with",
@@ -126,7 +126,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "와/과",
+    grammar: "과",
     example: "소설책과 교과서를 가져왔어요.",
     meanings: {
       en: "and",
@@ -162,7 +162,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "(이)랑",
+    grammar: "랑",
     example: "친구랑 같이 왔어요.",
     meanings: {
       en: "with (informal)",
@@ -486,7 +486,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "(이)나",
+    grammar: "나",
     example: "버스나 지하철 타고 갈게요.",
     meanings: {
       en: "or",
@@ -504,7 +504,7 @@ export const grammarExamples = [
     }
   },
   {
-    grammar: "(이)나",
+    grammar: "이나",
     example: "교환이나 환불 원하시면 연락주세요.",
     meanings: {
       en: "or",

@@ -1,71 +1,65 @@
-# OSX
-#
+# ✅ .env 환경변수 파일 무시
+.env
+
+# ✅ Info.plist 파일 무시 (모든 경로 포함)
+**/Info.plist
+**/info.plist
+
+# ✅ fastlane 폴더 전체 무시
+**/fastlane/
+
+# 🍎 macOS 관련 무시 파일
 .DS_Store
 
-# Xcode
-#
+# 🛠️ Xcode 관련 무시 파일
 build/
 *.pbxuser
-!default.pbxuser
 *.mode1v3
-!default.mode1v3
 *.mode2v3
-!default.mode2v3
 *.perspectivev3
-!default.perspectivev3
-xcuserdata
+xcuserdata/
 *.xccheckout
 *.moved-aside
-DerivedData
+DerivedData/
 *.hmap
 *.ipa
 *.xcuserstate
 **/.xcode.env.local
 
-# Android/IntelliJ
-#
-build/
-.idea
-.gradle
+# 🤖 Android / IntelliJ 관련 무시 파일
+.idea/
+.gradle/
 local.properties
 *.iml
 *.hprof
 .cxx/
 *.keystore
 !debug.keystore
+.kotlin/
 
-# node.js
-#
+# 📦 node.js 관련 무시 파일
 node_modules/
 npm-debug.log
 yarn-error.log
 
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
-# screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/
-
+# 🚀 Fastlane 리포트, 스크린샷 등 무시 (폴더 전체 이미 무시됨, 참고용)
 **/fastlane/report.xml
 **/fastlane/Preview.html
-**/fastlane/screenshots
-**/fastlane/test_output
+**/fastlane/screenshots/
+**/fastlane/test_output/
 
-# Bundle artifact
+# 📱 번들 아티팩트 무시
 *.jsbundle
 
-# Ruby / CocoaPods
+# 💎 Ruby / CocoaPods
 **/Pods/
-/vendor/bundle/
+vendor/bundle/
 
-# Temporary files created by Metro to check the health of the file watcher
+# ⚙️ Metro / 테스트 파일
 .metro-health-check*
+/coverage/
 
-# testing
-/coverage
-
-# Yarn
+# 🧶 Yarn
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -73,5 +67,7 @@ yarn-error.log
 !.yarn/sdks
 !.yarn/versions
 
-# Xcode 프로젝트에서 Info.plist 파일 무시
-ios/TopikOne/Info.plist
+*.pem
+
+*.keystore
+*.jks

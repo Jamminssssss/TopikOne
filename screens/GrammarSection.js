@@ -11,6 +11,7 @@ import {
   ScrollView,
   Pressable,
   SafeAreaView,
+  Animated,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Tts from 'react-native-tts';
@@ -27,15 +28,71 @@ const languages = [
   { code: 'vi', name: 'Tiếng Việt', icon: '🇻🇳' },
 ];
 
+const GrammarCard = ({ item, selectedLanguage, theme, speakText }) => {
+  const [showExample, setShowExample] = useState(false);
+  
+  const handlePress = () => {
+    setShowExample(!showExample);
+    if (!showExample) {
+      // Speak the example when showing it
+      speakText(item.example);
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      style={[
+        styles.grammarCard,
+        { backgroundColor: theme.cardBackground, borderColor: theme.primaryButtonColor }
+      ]}
+      onPress={handlePress}
+      activeOpacity={0.8}
+    >
+      {!showExample ? (
+        // Grammar view
+        <View style={styles.grammarView}>
+          <Text style={[styles.grammarText, { color: theme.textColor }]}>
+            {item.grammar}
+          </Text>
+          {selectedLanguage !== 'korean' && (
+            <Text style={[styles.meaningText, { color: theme.textColor }]}>
+              {item.meanings[selectedLanguage]}
+            </Text>
+          )}
+          <Text style={styles.tapInstruction}>
+            <Ionicons name="hand-left" size={16} color={theme.textColor} /> 탭하여 예문 보기
+          </Text>
+        </View>
+      ) : (
+        // Example view
+        <View style={styles.exampleView}>
+          <Text style={[styles.exampleText, { color: theme.textColor }]}>
+            {item.example}
+          </Text>
+          {selectedLanguage !== 'korean' && (
+            <View style={styles.translationsContainer}>
+              <Text style={[styles.translationText, { color: theme.textColor }]}>
+                {item.translations[selectedLanguage]}
+              </Text>
+            </View>
+          )}
+          <TouchableOpacity
+            style={styles.speakButton}
+            onPress={() => speakText(item.example)}
+          >
+            <Ionicons name="volume-high" size={20} color={theme.primaryButtonColor} />
+          </TouchableOpacity>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
+
 const GrammarSection = ({ navigation }) => {
   const [showGrammar, setShowGrammar] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showGrammarModal, setShowGrammarModal] = useState(false);
-  const [showExample, setShowExample] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('korean');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const [showTranslation, setShowTranslation] = useState(false);
 
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
@@ -47,6 +104,7 @@ const GrammarSection = ({ navigation }) => {
     primaryButtonColor: isDarkMode ? '#1a6bb8' : '#2196F3',
     modalBackground: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.95)',
     modalContentBackground: isDarkMode ? '#333' : '#fff',
+    cardShadow: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.1)',
   };
 
   useEffect(() => {
@@ -124,93 +182,13 @@ const GrammarSection = ({ navigation }) => {
 
   const resetGrammarState = () => {
     setShowGrammar(false);
-    setCurrentIndex(0);
-    setShowGrammarModal(false);
-    setShowExample(false);
-    setShowTranslation(false);
     setShowLanguageModal(false);
-  };
-
-  const handleNext = () => {
-    if (currentIndex < grammarExamples.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setShowGrammarModal(true);
-      setShowExample(false);
-      setShowTranslation(true);
-      setTimeout(() => {
-        speakText(grammarExamples[currentIndex + 1].grammar);
-      }, 100);
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setShowGrammarModal(true);
-      setShowExample(false);
-      setShowTranslation(true);
-      setTimeout(() => {
-        speakText(grammarExamples[currentIndex - 1].grammar);
-      }, 100);
-    }
-  };
-
-  const handleReplay = () => {
-    setShowGrammarModal(true);
-    setShowExample(false);
-    setShowTranslation(true);
-    setTimeout(() => {
-      speakText(grammarExamples[currentIndex].grammar);
-    }, 100);
-  };
-
-  const handleExamplePress = () => {
-    speakText(grammarExamples[currentIndex].example);
-    setShowTranslation(true);
   };
 
   const handleLanguageSelect = (language) => {
     setSelectedLanguage(language);
     setShowLanguageModal(false);
     setShowGrammar(true);
-    setShowGrammarModal(true);
-    setShowExample(false);
-    setShowTranslation(true);
-    setTimeout(() => {
-      speakText(grammarExamples[0].grammar);
-    }, 100);
-  };
-
-  const highlightGrammarInSentence = (sentence, grammar) => {
-    const parts = sentence.split(grammar);
-    return (
-      <Text style={[styles.exampleText, { color: theme.textColor }]}>
-        {parts.map((part, index) => (
-          <Text key={index}>
-            {part}
-            {index < parts.length - 1 && (
-              <Text style={{ color: 'red' }}>{grammar}</Text>
-            )}
-          </Text>
-        ))}
-      </Text>
-    );
-  };
-
-  const highlightMeaning = (meaning, grammar) => {
-    const parts = meaning.split(grammar);
-    return (
-      <Text style={styles.meaningText}>
-        {parts.map((part, index) => (
-          <Text key={index}>
-            {part}
-            {index < parts.length - 1 && (
-              <Text style={{ color: 'red' }}>{grammar}</Text>
-            )}
-          </Text>
-        ))}
-      </Text>
-    );
   };
 
   const getLanguageName = (lang) => {
@@ -222,13 +200,6 @@ const GrammarSection = ({ navigation }) => {
       vi: 'Tiếng Việt',
     };
     return languageNames[lang] || lang;
-  };
-
-  const getTranslationText = (lang) => {
-    if (lang === 'korean') {
-      return '뜻';
-    }
-    return grammarExamples[currentIndex].translations[lang];
   };
 
   useLayoutEffect(() => {
@@ -268,29 +239,20 @@ const GrammarSection = ({ navigation }) => {
     }
   }, [navigation, showGrammar, selectedLanguage]);
 
-  useEffect(() => {
-    if (showGrammarModal) {
-      const timer = setTimeout(() => {
-        setShowGrammarModal(false);
-        setShowExample(true);
-        setShowTranslation(true);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showGrammarModal]);
-
   if (!showGrammar) {
     return (
       <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-        <TouchableOpacity
-          style={styles.mainButton}
-          onPress={() => setShowLanguageModal(true)}
-        >
-          <Ionicons name="book" size={50} color={theme.textColor} />
-          <Text style={[styles.text, { color: theme.textColor, marginTop: 10 }]}>
-            문법 학습 시작하기
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.centerContainer}>
+          <TouchableOpacity
+            style={styles.mainButton}
+            onPress={() => setShowLanguageModal(true)}
+          >
+            <Ionicons name="book" size={50} color={theme.textColor} />
+            <Text style={[styles.text, { color: theme.textColor, marginTop: 10 }]}>
+              문법 학습 시작하기
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <Modal
           visible={showLanguageModal}
@@ -339,62 +301,20 @@ const GrammarSection = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-      {showGrammarModal ? (
-        <View style={styles.grammarModal}>
-          <Text style={styles.grammarText}>
-            {grammarExamples[currentIndex].grammar}
-          </Text>
-          {selectedLanguage !== 'korean' && (
-            <Text style={styles.meaningText}>
-              {grammarExamples[currentIndex].meanings[selectedLanguage]}
-            </Text>
-          )}
-        </View>
-      ) : (
-        <View style={styles.exampleContainer}>
-          <TouchableOpacity
-            style={styles.exampleCard}
-            onPress={handleExamplePress}
-          >
-            <Text style={[styles.exampleText, { color: theme.textColor }]}>
-              {grammarExamples[currentIndex].example}
-            </Text>
-          </TouchableOpacity>
-          
-          {selectedLanguage !== 'korean' && (
-            <View style={styles.translationsContainer}>
-              <Text style={[styles.translationText, { color: theme.textColor }]}>
-                {grammarExamples[currentIndex].translations[selectedLanguage]}
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
-
-      <View style={styles.navigationContainer}>
-        <TouchableOpacity
-          onPress={handlePrev}
-          style={[styles.navButton, currentIndex === 0 && styles.disabledButton]}
-          disabled={currentIndex === 0}
-        >
-          <Ionicons name="chevron-back" size={24} color={theme.textColor} />
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          onPress={handleReplay}
-          style={styles.navButton}
-        >
-          <Ionicons name="reload" size={24} color={theme.textColor} />
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          onPress={handleNext}
-          style={[styles.navButton, currentIndex === grammarExamples.length - 1 && styles.disabledButton]}
-          disabled={currentIndex === grammarExamples.length - 1}
-        >
-          <Ionicons name="chevron-forward" size={24} color={theme.textColor} />
-        </TouchableOpacity>
-      </View>
+      <ScrollView 
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {grammarExamples.map((item, index) => (
+          <GrammarCard
+            key={index}
+            item={item}
+            selectedLanguage={selectedLanguage}
+            theme={theme}
+            speakText={speakText}
+          />
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -402,9 +322,84 @@ const GrammarSection = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollViewContent: {
+    padding: isIPad ? 20 : 10,
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
+  grammarCard: {
+    width: '100%',
+    borderRadius: 15,
+    marginBottom: 20,
+    padding: isIPad ? 20 : 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  grammarView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    minHeight: isIPad ? 150 : 100,
+  },
+  exampleView: {
+    alignItems: 'center',
+    padding: 10,
+    minHeight: isIPad ? 150 : 100,
+  },
+  grammarText: {
+    fontSize: isIPad ? 36 : 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  meaningText: {
+    fontSize: isIPad ? 28 : 18,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  tapInstruction: {
+    fontSize: isIPad ? 16 : 12,
+    color: '#888',
+    marginTop: 10,
+  },
+  exampleText: {
+    fontSize: isIPad ? 32 : 22,
+    textAlign: 'center',
+    lineHeight: isIPad ? 48 : 32,
+    marginBottom: 15,
+  },
+  translationsContainer: {
+    width: '100%',
+    paddingVertical: 10,
+    marginTop: 5,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  translationText: {
+    fontSize: isIPad ? 24 : 16,
+    lineHeight: isIPad ? 36 : 24,
+    textAlign: 'center',
+  },
+  speakButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  // Previous styles from original component
   buttonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -416,88 +411,6 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginLeft: 15,
-  },
-  grammarModal: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'black',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  grammarText: {
-    color: 'white',
-    fontSize: isIPad ? 60 : 36,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  meaningText: {
-    color: 'white',
-    fontSize: isIPad ? 40 : 24,
-    textAlign: 'center',
-  },
-  exampleContainer: {
-    flex: 1,
-    width: '100%',
-    padding: isIPad ? 20 : 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 60,
-  },
-  exampleCard: {
-    width: isIPad ? '90%' : '95%',
-    padding: isIPad ? 25 : 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    minHeight: 'auto',
-  },
-  exampleText: {
-    fontSize: isIPad ? 48 : 28,
-    textAlign: 'center',
-    lineHeight: isIPad ? 72 : 42,
-    padding: isIPad ? 15 : 10,
-    textDecorationLine: 'none',
-  },
-  translationsContainer: {
-    width: isIPad ? '90%' : '95%',
-    padding: isIPad ? 25 : 15,
-    borderRadius: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    minHeight: 'auto',
-    alignItems: 'center',
-  },
-  translationText: {
-    fontSize: isIPad ? 32 : 16,
-    lineHeight: isIPad ? 48 : 24,
-    textAlign: 'center',
-    padding: isIPad ? 15 : 10,
-    textDecorationLine: 'none',
-  },
-  navigationContainer: {
-    position: 'absolute',
-    bottom: isIPad ? 40 : 20,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    width: '100%',
-  },
-  navButton: {
-    padding: isIPad ? 20 : 15,
-    marginHorizontal: isIPad ? 20 : 10,
-    borderRadius: 30,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  disabledButton: {
-    opacity: 0.3,
   },
   mainButton: {
     alignItems: 'center',
@@ -527,10 +440,10 @@ const styles = StyleSheet.create({
     marginBottom: isIPad ? 30 : 20,
   },
   languageButtonsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
   },
   languageButton: {
     marginRight: 15,
@@ -586,4 +499,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GrammarSection; 
+export default GrammarSection;

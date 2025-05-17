@@ -19,3 +19,4 @@
 
 # 네이티브 라이브러리 예외 처리
 -keep class * extends android.app.Application { *; }
+
