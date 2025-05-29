@@ -353,9 +353,17 @@ const styles = StyleSheet.create({
     minHeight: isIPad ? 150 : 100,
   },
   exampleView: {
-    alignItems: 'center',
     padding: 10,
     minHeight: isIPad ? 150 : 100,
+  },
+  exampleContentContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  exampleTextContainer: {
+    flex: 1,
+    paddingRight: 15,
   },
   grammarText: {
     fontSize: isIPad ? 36 : 24,
@@ -375,7 +383,7 @@ const styles = StyleSheet.create({
   },
   exampleText: {
     fontSize: isIPad ? 32 : 22,
-    textAlign: 'center',
+    textAlign: 'left',
     lineHeight: isIPad ? 48 : 32,
     marginBottom: 15,
   },
@@ -389,15 +397,17 @@ const styles = StyleSheet.create({
   translationText: {
     fontSize: isIPad ? 24 : 16,
     lineHeight: isIPad ? 36 : 24,
-    textAlign: 'center',
+    textAlign: 'left',
   },
   speakButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    padding: 12,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    alignSelf: 'flex-start',
   },
   // Previous styles from original component
   buttonContainer: {
